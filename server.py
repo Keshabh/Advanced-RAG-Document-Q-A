@@ -13,6 +13,7 @@ from langchain_community.vectorstores import FAISS
 # from langchain_core.tools import StructuredTool
 import tempfile
 import os
+import re
 import streamlit as st
 # import google.generativeai as genai
 from langchain_core.prompts import ChatPromptTemplate
@@ -111,68 +112,125 @@ def get_pdf_text(pdfs):
             text+=page.extract_text()
     return text
 
+def hash_text(data):
+    if isinstance(data, bytes):
+        return hashlib.sha256(data).hexdigest()
+    return hashlib.sha256(data.encode("utf-8")).hexdigest()
+
+
+def semantic_sections(text: str):
+    """
+    Split text by section headers like:
+    Abstract, 1 Introduction, 2 Related Work, etc.
+    """
+    pattern = r"\n(?=(?:Abstract|\d+\s+[A-Z][^\n]{0,50}))"
+    sections = re.split(pattern, text)
+    merged = []
+
+    buf = ""
+    for part in sections:
+        if part.strip() in ["Abstract"] or re.match(r"\d+\s+[A-Z]", part.strip()):
+            if buf.strip():
+                merged.append(buf.strip())
+            buf = part
+        else:
+            buf += "\n" + part
+
+    if buf.strip():
+        merged.append(buf.strip())
+
+    return merged
+
+
 def processPdf(pdfs):
-    existing_hashes = set()
-    if st.session_state.vector_store:
-        for doc in st.session_state.vector_store.docstore._dict.values():
-            if "pdf_hash" in doc.metadata:
-                existing_hashes.add(doc.metadata["pdf_hash"])
+    vector_store = st.session_state.get("vector_store")
+
+    existing_chunk_hashes = set()
+    existing_docs = {}
+
+    if vector_store:
+        for k, doc in vector_store.docstore._dict.items():
+            ch = doc.metadata.get("chunk_hash")
+            if ch:
+                existing_chunk_hashes.add(ch)
+                existing_docs[ch] = k
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
 
     all_texts = []
     all_metadatas = []
-    
-
-    # all_new_chunks = []
+    new_chunk_hashes = set()
 
     for pdf in pdfs:
-        pdf_hash = get_pdf_hash(pdf)
+        pdf_bytes = pdf.read()
+        pdf_hash = hash_text(pdf_bytes)
+        pdf.seek(0)
 
-        # ---- DUPLICATE CHECK ----
-        print(pdf_hash, existing_hashes)
-        if pdf_hash in existing_hashes:
-            st.warning(f"⚠️ {pdf.name} already processed. Skipping.")
-            continue
-
-        # ---- READ PDF ----
         reader = PdfReader(pdf)
         full_text = ""
         for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                full_text += text
+            t = page.extract_text()
+            if t:
+                full_text += t + "\n"
 
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
-        )
-        chunks = splitter.split_text(full_text)
+        sections = semantic_sections(full_text)
 
-        # ---- STORE TEXT + METADATA ----
-        for chunk in chunks:
-            all_texts.append(chunk)
-            all_metadatas.append({
-                "pdf_hash": pdf_hash,
-                "source": pdf.name
-            })
+        for section in sections:
+            chunks = (
+                [section]
+                if len(section) <= 1200
+                else splitter.split_text(section)
+            )
 
-    # ---- ADD ONLY NEW CHUNKS ----
+            for chunk in chunks:
+                chunk_hash = hash_text(chunk)
+                new_chunk_hashes.add(chunk_hash)
+
+                if chunk_hash in existing_chunk_hashes:
+                    continue
+
+                all_texts.append(chunk)
+                all_metadatas.append({
+                    "pdf_hash": pdf_hash,
+                    "chunk_hash": chunk_hash,
+                    "source": pdf.name
+                })
+    # st.write(all_texts)
+    # exit(1)
+
+    # delete stale chunks
+    if vector_store:
+        stale_ids = [
+            k for ch, k in existing_docs.items()
+            if ch not in new_chunk_hashes
+        ]
+        print(stale_ids)
+
+        if stale_ids:
+            vector_store.delete(ids=stale_ids)
+
+    # add new chunks
     if all_texts:
-        if st.session_state.vector_store:
-            st.session_state.vector_store.add_texts(all_texts, metadatas=all_metadatas)
+        if vector_store:
+            vector_store.add_texts(all_texts, metadatas=all_metadatas)
         else:
-            st.session_state.vector_store = FAISS.from_texts(
+            vector_store = FAISS.from_texts(
                 all_texts,
                 embedding=embeddings,
                 metadatas=all_metadatas
             )
 
-        st.session_state.vector_store.save_local("faiss_index")
-        st.success("New PDFs indexed successfully!")
+        vector_store.save_local("faiss_index")
+        st.success("PDF updated incrementally (no duplication).")
     else:
-        st.info("No new documents to process.")
+        st.info("No new content detected.")
 
-    flag_processed = True
-    return st.session_state.vector_store
+    st.session_state.vector_store = vector_store
+    return vector_store
+
 
 if pdfs and submit:
     st.session_state.vector_store = processPdf(pdfs)
@@ -186,8 +244,8 @@ if answerButton and input:
     st.write("Response: ")
     context = retrieve_context(input)
     st.write(context)
-    # response = llm.invoke(prompt.format(context=context, input=input))
-    # st.write(response.content)
+    response = llm.invoke(prompt.format(context=context, input=input))
+    st.write(response.content)
     
     
 

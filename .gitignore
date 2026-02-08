@@ -18,7 +18,7 @@ env*/
 */.env.*
 
 #data file
-attention.pdf
+attention*.pdf
 
 #vector file
 faiss_index/
