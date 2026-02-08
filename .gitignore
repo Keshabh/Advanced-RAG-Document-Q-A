@@ -1,0 +1,24 @@
+# --- VENVs anywhere in the repo ---
+venv/
+.venv/
+*/venv/
+*/.venv/
+*venv/
+.venv
+
+# If you use custom names like p1_env, p2_env
+*_env/
+env*/
+
+# --- ENV files anywhere ---
+.env
+*.env
+.env.*
+*/.env
+*/.env.*
+
+#data file
+attention.pdf
+
+#vector file
+faiss_index/
