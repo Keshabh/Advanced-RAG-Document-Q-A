@@ -16,6 +16,7 @@ pending
 4. Separation of different layer in separate files- pdf to text, chunking, vector_store, retrieval, generation, ui
 5. Meta data (file name, page no, source)
 6. Avoid storing same information again and again
+
 7. For now processing same file is avoided, but what if i change just 1 line during 2nd time procesing the same file, then file will get reprocessed, and retrievd chunks would be duplicated then.
 8. if faiss_index file is absent, and no document has been processed yet.
 then if we type in any query and press get answer button.
@@ -46,7 +47,20 @@ hash from old chunk, which is not present in new chunk hash, delete that chunk  
 5. ? If i am using paragraph/section based hashing, and not using recursivecharactertextsplitter, do i not loose the importance of this recurisve splitter ?
 
 
--> with paragraph/section based haashing, pdf is not read properly, and paragraph is not catched proeprly.
-
 -> New Approach: semantic approach (where each section like introduction, abstract, header1.... is split )
 there should be a sized based fallback as well, when size of a section is too much, then it is further split.
+
+
+#Re-ranking approach
+-> After semantic retrieval of top 10 chunks
+-> Keywords are extracted from user's query such as (text with underscore, numbers, os any completely upper case words, using regular expression)
+-> Then top 10 chunk is split into 2 halves of 3 and 7.(to make sure semantic result is not overridden by keyword coincidence)
+-> Top 3 group is re-rank using keywords extracted.
+where for each chunk, scoring is done based on presence of keyword in chunk i.e if keyword is present in chunk then plus 1
+-> Same scoring is done for Rest 7 group
+If score > 0, keep the chunk else discard it.
+-> Top 3 group is sorted in descending order based on score and same is done with rest 7 group.
+-> Top 3 group is appended with Rest 7 group.
+-> Then they are merged with double new line to return it as a context.
+-> with paragraph/section based haashing, pdf is not read properly, and paragraph is not catched proeprly.
+
