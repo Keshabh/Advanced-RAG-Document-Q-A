@@ -14,6 +14,8 @@ from langchain_community.vectorstores import FAISS
 import tempfile
 import os
 import streamlit as st
+import hashlib
+import re
 # import google.generativeai as genai
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -22,7 +24,25 @@ embeddings = GoogleGenerativeAIEmbeddings(
     google_api_key=os.getenv("GEMINI_API_KEY")
 )
 
-import hashlib
+
+def extract_keywords(query: str):
+    """
+    Extract exact-match friendly keywords:
+    - error codes
+    - numbers
+    - uppercase tokens
+    """
+    tokens = re.findall(r"[A-Za-z0-9_\-]+", query)
+    keywords = [
+        t for t in tokens
+        if (
+            any(c.isdigit() for c in t) or     # numbers / codes
+            t.isupper() or                     # ORA, HTTP
+            "_" in t                           # snake_case
+        )
+    ]
+    return set(k.lower() for k in keywords)
+
 
 def get_pdf_hash(pdf_file):
     """
@@ -178,26 +198,32 @@ if pdfs and submit:
     st.session_state.vector_store = processPdf(pdfs)
 
 def retrieve_context(query: str):
-    docs = st.session_state.vector_store.similarity_search(query, k=3)
-    context = "\n\n".join(doc.page_content for doc in docs)
+    # Step 1: semantic search
+    docs = st.session_state.vector_store.similarity_search(query, k=10)
+
+    # Step 2: keyword extraction
+    query_keywords = extract_keywords(query)
+    print("query", query)
+    print("query_keywords: ", query_keywords)
+
+    # Step 3: keyword re-ranking / filtering
+    ranked_docs = []
+    for doc in docs:
+        text = doc.page_content.lower()
+        score = sum(1 for kw in query_keywords if kw in text)
+        ranked_docs.append((score, doc))
+
+    # sort by keyword score (desc)
+    ranked_docs.sort(key=lambda x: x[0], reverse=True)
+    # fallback-safe: keep semantic order if no keyword hits
+    final_docs = [d for s, d in ranked_docs if s > 0] or docs[:3]
+    context = "\n\n".join(doc.page_content for doc in final_docs[:3])
     return context
+
 
 if answerButton and input:
     st.write("Response: ")
     context = retrieve_context(input)
-    st.write(context)
-    # response = llm.invoke(prompt.format(context=context, input=input))
-    # st.write(response.content)
-    
-    
-
-
-
-
-
-
-    
-
-
-
-
+    # st.write(context)
+    response = llm.invoke(prompt.format(context=context, input=input))
+    st.write(response.content)

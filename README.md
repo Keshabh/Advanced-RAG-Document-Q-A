@@ -16,8 +16,6 @@ pending
 4. Separation of different layer in separate files- pdf to text, chunking, vector_store, retrieval, generation, ui
 5. Meta data (file name, page no, source)
 6. Avoid storing same information again and again
-7. For now processing same file is avoided, but what if i change just 1 line during 2nd time procesing the same file, then file will get reprocessed, and retrievd chunks would be duplicated then.
-
 
 ? how does the following work?
 from dotenv import load_dotenv
@@ -41,3 +39,16 @@ Approach:
 4. For deletion of older chunk which is modified now:
 hash from old chunk, which is not present in new chunk hash, delete that chunk
 
+
+
+#Re-ranking approach
+-> After semantic retrieval of top 10 chunks
+-> Keywords are extracted from user's query such as (text with underscore, numbers, os any completely upper case words, using regular expression)
+-> Then top 10 chunk is split into 2 halves of 3 and 7.(to make sure semantic result is not overridden by keyword coincidence)
+-> Top 3 group is re-rank using keywords extracted.
+where for each chunk, scoring is done based on presence of keyword in chunk i.e if keyword is present in chunk then plus 1
+-> Same scoring is done for Rest 7 group
+If score > 0, keep the chunk else discard it.
+-> Top 3 group is sorted in descending order based on score and same is done with rest 7 group.
+-> Top 3 group is appended with Rest 7 group.
+-> Then they are merged with double new line to return it as a context.
