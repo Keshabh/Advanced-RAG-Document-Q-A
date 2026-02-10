@@ -17,6 +17,12 @@ pending
 5. Meta data (file name, page no, source)
 6. Avoid storing same information again and again
 
+7. For now processing same file is avoided, but what if i change just 1 line during 2nd time procesing the same file, then file will get reprocessed, and retrievd chunks would be duplicated then.
+8. if faiss_index file is absent, and no document has been processed yet.
+then if we type in any query and press get answer button.
+currently, we get NoneType error, which needs to be fixed with Warning Message.
+
+
 ? how does the following work?
 from dotenv import load_dotenv
 load_dotenv()
@@ -37,8 +43,12 @@ Approach:
 2. Do paragraph/section based hashing instead of chunk hasing to avoid boundary shifts.
 3. If paragraph/section hash is present in existing_hash: skip it, else add it.
 4. For deletion of older chunk which is modified now:
-hash from old chunk, which is not present in new chunk hash, delete that chunk
+hash from old chunk, which is not present in new chunk hash, delete that chunk  (avoids re-indexing of the same data, as well data duplication)
+5. ? If i am using paragraph/section based hashing, and not using recursivecharactertextsplitter, do i not loose the importance of this recurisve splitter ?
 
+
+-> New Approach: semantic approach (where each section like introduction, abstract, header1.... is split )
+there should be a sized based fallback as well, when size of a section is too much, then it is further split.
 
 
 #Re-ranking approach
@@ -52,3 +62,5 @@ If score > 0, keep the chunk else discard it.
 -> Top 3 group is sorted in descending order based on score and same is done with rest 7 group.
 -> Top 3 group is appended with Rest 7 group.
 -> Then they are merged with double new line to return it as a context.
+-> with paragraph/section based haashing, pdf is not read properly, and paragraph is not catched proeprly.
+
