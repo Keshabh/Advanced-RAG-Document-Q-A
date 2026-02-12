@@ -11,11 +11,11 @@ Current State:
 
 pending
 --------
-2. Hybrid search model =  Semantic + Keyword Search
-3. Re-Ranking
-4. Separation of different layer in separate files- pdf to text, chunking, vector_store, retrieval, generation, ui
-5. Meta data (file name, page no, source)
-6. Avoid storing same information again and again
+4. Separation of different layer in separate files- pdf to text, chunking, vector_store, retrieval, generation, ui -  code approach
+5. Meta data (file name, page no, source) + work with scenario when answer is button but no question is provided, and no file is processed yet.
+6. FASTAPI? , client-server, deployment.
+7. Multi-document, not just pdf
+8. Edge cases, check with Gpt.
 
 7. For now processing same file is avoided, but what if i change just 1 line during 2nd time procesing the same file, then file will get reprocessed, and retrievd chunks would be duplicated then.
 8. if faiss_index file is absent, and no document has been processed yet.
@@ -26,8 +26,6 @@ currently, we get NoneType error, which needs to be fixed with Warning Message.
 ? how does the following work?
 from dotenv import load_dotenv
 load_dotenv()
-
-
 
 *Scenario* Document update (re-process same file twice with minor modification)
 1. Problem with chunk hashing
@@ -62,5 +60,17 @@ If score > 0, keep the chunk else discard it.
 -> Top 3 group is sorted in descending order based on score and same is done with rest 7 group.
 -> Top 3 group is appended with Rest 7 group.
 -> Then they are merged with double new line to return it as a context.
--> with paragraph/section based haashing, pdf is not read properly, and paragraph is not catched proeprly.
+
+
+
+
+
+pending:
+---------
+1. when no document is processed, and question is provided and answer button is clicked, then it gives random error- needs to be fixed.
+2. deployment works fine: https://adv-rag-pdf.streamlit.app/
+-> currently if a document is processed, faiss_index file is created, and it is common to any user.
+-> need to add register/signin feature to make it user specific.
+3. why would anyone use my application, if they can use chatgpt and gemini to process their file, and perform RAG over there.
+4. Limit users usage.
 
