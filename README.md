@@ -1,46 +1,39 @@
-# Advanced RAG Document Q&A
+## Features
 
-## Description
-The Advanced RAG Document Q&A project aims to provide an efficient solution for question answering using Retrieval-Augmented Generation (RAG) principles. This repository showcases a tailored approach to document retrieval and answer generation utilizing state-of-the-art AI techniques.
+### 1. **Multi-Document PDF Processing**
+   - Upload multiple PDF files simultaneously
+   - Extract text from PDFs with PyPDF2
+   - Semantic section detection (Abstract, numbered sections, etc.)
 
-## Usage
-To run the project, execute the following command:
+### 2. **Intelligent Text Chunking**
+   - RecursiveCharacterTextSplitter with 1000-char chunks and 200-char overlap
+   - Semantic section-based splitting (preserves document structure)
+   - Duplicate detection using SHA-256 hashing (prevents re-processing)
 
-```bash
-streamlit run app/app.py
-```
+### 3. **Hybrid Retrieval System**
+   - **Semantic Search**: FAISS vector store similarity search (k=10)
+   - **Keyword Extraction**: Extracts error codes, numbers, uppercase tokens (ORA, HTTP, etc.)
+   - **Keyword Re-ranking**: Filters and ranks results by keyword score
+   - Fallback mechanism for missing keyword hits
 
-Follow the on-screen instructions to interact with the document Q&A system.
+### 4. **Vector Store Management**
+   - Persistent FAISS vector store with incremental updates
+   - Chunk hashing to avoid duplication
+   - Automatic deletion of stale chunks when documents change
+   - Support for metadata tracking (PDF hash, chunk hash, source file)
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact Information](#contact-information)
+### 5. **Prompt Engineering**
+   - Strict document-grounded prompts (no external knowledge allowed)
+   - Context-based Q&A with exact value reproduction
+   - Guard rails: Returns "The document does not contain this information" when needed
 
-## Installation
-To get started with the Advanced RAG Document Q&A project, clone the repository and install the required dependencies:
+### 6. **LLM Integration**
+   - Google Gemini 2.5 Flash Lite model
+   - Zero temperature (deterministic responses)
+   - Google Generative AI embeddings
 
-```bash
-git clone https://github.com/Keshabh/Advanced-RAG-Document-Q-A.git
-cd Advanced-RAG-Document-Q-A
-pip install -r requirements.txt
-```
-
-## Contributing
-We welcome contributions from the community! Please follow these steps to contribute:
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some feature'`)
-5. Push to the branch (`git push origin feature-branch`)
-6. Open a Pull Request
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact Information
-For any inquiries, please contact:
-- **Name**: Keshabh
-- **Email**: [your-email@example.com]
+### 7. **Streamlit UI**
+   - Sidebar for PDF uploads with multi-file support
+   - Text input for user queries
+   - Real-time processing feedback (success/info messages)
+   - Response display with BlobSha 80ce885edb71141dde3bff32b2dbe97c2e5c4481
