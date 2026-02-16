@@ -1,3 +1,22 @@
+---
+
+# 🏷 Badges
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Store-green)
+![LangChain](https://img.shields.io/badge/LangChain-Framework-yellow)
+![Google Gemini](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash%20Lite-purple)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+---
+
+# 🖼 Demo
+```
+assets/demo.gif
+```
+---
+
 # 📄 Advanced RAG – Multi-Format Document Q&A System
 
 An AI-powered Retrieval-Augmented Generation (RAG) system that supports **multi-format document ingestion**, **incremental vector indexing**, and a **hybrid retrieval pipeline** combining semantic search with keyword re-ranking.
@@ -140,14 +159,65 @@ Used for:
 
 ---
 
-# 🏷 Badges
+# 🏗 Architecture Overview
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
-![FAISS](https://img.shields.io/badge/FAISS-Vector%20Store-green)
-![LangChain](https://img.shields.io/badge/LangChain-Framework-yellow)
-![Google Gemini](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash%20Lite-purple)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
+```
+                ┌────────────────────────┐
+                │     Streamlit UI       │
+                │  (Upload + Query UI)   │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                ┌────────────────────────┐
+                │   Document Processor   │
+                │ (Multi-format extract) │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                ┌────────────────────────┐
+                │  Semantic Chunking     │
+                │  + SHA256 Hashing      │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                ┌────────────────────────┐
+                │    FAISS Vector DB     │
+                │ (Incremental Updates)  │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                ┌────────────────────────┐
+                │   Hybrid Retrieval     │
+                │  Semantic + Keyword    │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                ┌────────────────────────┐
+                │  Gemini LLM (Temp=0)   │
+                │  Strict Guardrails     │
+                └────────────┬───────────┘
+                             │
+                             ▼
+                     Final Grounded Answer
+```
+
+---
+
+# 🧠 Retrieval Pipeline (Step-by-Step)
+
+1. User uploads documents (PDF, DOCX, PPTX, TXT, CSV)
+2. File content extracted via format-specific extractor
+3. Text split using semantic section detection
+4. Chunks created (1000 chars, 200 overlap)
+5. SHA-256 hashing prevents duplication
+6. FAISS updated incrementally
+7. On query:
+   - Semantic search (k=10)
+   - Keyword extraction
+   - Keyword-based re-ranking
+   - Top 3 chunks selected
+8. Strict prompt grounding
+9. Gemini LLM generates deterministic answer
 
 ---
 
@@ -220,4 +290,19 @@ GEMINI_API_KEY=your_api_key_here
 ```bash
 streamlit run app/app.py
 ```
+---
+
+# 🔮 Future Enhancements
+
+- Centralized configuration for `chunk_size`, `chunk_overlap`, and `top_k`  
+- Structured logging using Python `logging` module for better observability  
+- Robust exception handling to prevent runtime crashes (e.g., no FAISS index, empty query)  
+- Evaluation mode to display retrieved chunks before LLM generation  
+- FastAPI backend separation (client–server architecture)  
+- User authentication with user-specific vector stores  
+- Rate limiting and usage controls for public deployment  
+- Conversational memory with multi-turn chat interface  
+- Metadata-based filtering during retrieval  
+- Streaming LLM responses for improved UX  
+- Enhanced UI with GPT-style chat experience  
 
