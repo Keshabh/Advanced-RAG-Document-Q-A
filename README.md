@@ -12,9 +12,8 @@
 ---
 
 # 🖼 Demo
-```
-demo.mp4
-```
+![Demo](applicationDemo.gif)
+
 ---
 
 # 📄 Advanced RAG – Multi-Format Document Q&A System
