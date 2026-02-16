@@ -22,3 +22,7 @@ attention*.pdf
 
 #vector file
 faiss_index/
+
+__pycache__/
+*.pyc
+

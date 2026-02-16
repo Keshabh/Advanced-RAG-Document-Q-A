@@ -7,4 +7,6 @@ python-multipart
 streamlit
 langchain_google_genai
 pypdf2
+python-docx
+python-pptx
 google.generativeai

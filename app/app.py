@@ -1,7 +1,7 @@
 import streamlit as st
 from core.embeddings import get_embeddings
 from core.retriever import retrieve_context
-from services.pdf_processor import processPdf
+from services.pdf_processor import processFiles
 from core.llm import get_llm
 from core.prompt import get_prompt
 from langchain_community.vectorstores import FAISS
@@ -17,13 +17,13 @@ if "vector_store" not in st.session_state:
         print("Initalized vector_store with faiss_index successfully!")
 
 
-st.subheader("AI Powered Smart PDF Reader")
+st.subheader("AI Powered Smart Document Reader")
 
 with st.sidebar:
-    st.header("📂 Upload PDFs")
+    st.header("📂 Upload Documents")
     uploaded_files = st.file_uploader(
-            "Upload PDF files",
-            type=["pdf"],
+            "DOCX, PDF, TXT, CSV, PPTX",
+            type=["docx", "pdf", "txt", "csv", "pptx"],
             accept_multiple_files=True
         )
     submit = st.button("Process!", key = "process")
@@ -39,7 +39,7 @@ answerButton = st.button("Get Answer", key = "getAnswer")
 
 if pdfs and submit:
     vector_store = st.session_state.get("vector_store")
-    st.session_state.vector_store, message = processPdf(pdfs,vector_store)
+    st.session_state.vector_store, message = processFiles(pdfs,vector_store)
     if message:
         print(message.keys())
         if "success" in message.keys():
@@ -57,4 +57,4 @@ if answerButton and input:
         response = get_llm().invoke(get_prompt().format(context=context, input=input))
         st.write(response.content)
     else:
-        st.info("No PDF has been processed, Please Process the document first.")
+        st.info("No Document has been processed, Please Process the document first.")
