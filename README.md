@@ -13,7 +13,7 @@
 
 # 🖼 Demo
 ```
-assets/demo.gif
+demo.mp4
 ```
 ---
 
@@ -271,54 +271,3 @@ streamlit run app/app.py
 - Metadata-based filtering during retrieval  
 - Streaming LLM responses for improved UX  
 - Enhanced UI with GPT-style chat experience  
-
-
-
-PENDING TASKS:
-1. Add logging modules as following:
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-logger.info("Loading vector store")
-logger.warning("No new content detected")
-
-
-2. Exception Handling
-try:
-    ...
-except Exception as e:
-    logger.error(str(e))
-    raise
-
-3. Add Evaluation Mode (Huge Upgrade)
-[ ] Show Retrieved Chunks
-
-4️. Add Config File for Parameters
-chunk_size
-chunk_overlap
-k value
-
-5. Convert to FastAPI Backend
-FastAPI (RAG API)
-+
-Streamlit (UI client)
-
-6. Multi-format document 
-services/
-├── loaders/
-│   ├── pdf_loader.py
-│   ├── docx_loader.py
-│   ├── xlsx_loader.py
-│   └── txt_loader.py
-│
-├── ingestion_pipeline.py
-
-7. Deploy it on render
-
-8. More upgrades if required to make it intelligent system.
-
-9. Add look and features like gpt and others gpts.
-
-10. Just after processing, ask a question, i guess currently there is a bug which says "File still needs to be processed"
-
-11. show conversational chats
