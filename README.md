@@ -138,6 +138,19 @@ Used for:
 
 ---
 
+---
+
+# 🏷 Badges
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Store-green)
+![LangChain](https://img.shields.io/badge/LangChain-Framework-yellow)
+![Google Gemini](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash%20Lite-purple)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+---
+
 # 🏗 Project Structure
 app/
 └── app.py
@@ -166,5 +179,45 @@ config.py
 ```bash
 git clone <repo-url>
 cd Advanced-RAG-Document-Q-A
+```
 
-## 1️⃣ Clone Repository
+## 2️⃣ Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+### Activate Virtual Environment
+
+**Mac / Linux**
+```bash
+source venv/bin/activate
+```
+
+**Windows**
+```bash
+venv\Scripts\activate
+```
+
+## 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## 4️⃣ Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+> ⚠️ For deployment (e.g., Render), configure environment variables in the platform dashboard instead of using `.env`.
+
+## 5️⃣ Run the Application
+
+```bash
+streamlit run app/app.py
+```
+
