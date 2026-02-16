@@ -1,76 +1,46 @@
-P-11, P-9
+# Advanced RAG Document Q&A
 
-Current State:
----------------
-1. Document is getting parsed and stored in faiss vector db, and also creates a file for reuse, and upon questioning, LLM is returning the answer.
-2. Fine Tunning done by giving better prompt.
-3. Faiss index is used if present, so when application loads, vector db is intiialized with faiss_index file.
-4. Same file is getting processed twice- so the top 2 chunks retrieved are same,because of duplication. This needs to be solved. Also hash generated for the pdf needs to be saved as meta data in order to comapre it later. (solved)
-? what if i change the file name, but content in before and after is same
-? what if file name is same, but content has changed a very little, does it duplicate then. since hash is supposed to be different.
+## Description
+The Advanced RAG Document Q&A project aims to provide an efficient solution for question answering using Retrieval-Augmented Generation (RAG) principles. This repository showcases a tailored approach to document retrieval and answer generation utilizing state-of-the-art AI techniques.
 
-pending
---------
-4. Separation of different layer in separate files- pdf to text, chunking, vector_store, retrieval, generation, ui -  code approach
-5. Meta data (file name, page no, source) + work with scenario when answer is button but no question is provided, and no file is processed yet.
-6. FASTAPI? , client-server, deployment.
-7. Multi-document, not just pdf
-8. Edge cases, check with Gpt.
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact Information](#contact-information)
 
-7. For now processing same file is avoided, but what if i change just 1 line during 2nd time procesing the same file, then file will get reprocessed, and retrievd chunks would be duplicated then.
-8. if faiss_index file is absent, and no document has been processed yet.
-then if we type in any query and press get answer button.
-currently, we get NoneType error, which needs to be fixed with Warning Message.
+## Installation
+To get started with the Advanced RAG Document Q&A project, clone the repository and install the required dependencies:
 
+```bash
+git clone https://github.com/Keshabh/Advanced-RAG-Document-Q-A.git
+cd Advanced-RAG-Document-Q-A
+pip install -r requirements.txt
+```
 
-? how does the following work?
-from dotenv import load_dotenv
-load_dotenv()
+## Usage
+To run the project, execute the following command:
 
-*Scenario* Document update (re-process same file twice with minor modification)
-1. Problem with chunk hashing
--> Addition of a single word in the file, can shift the chunk boundaries, and most of the chunks can change, and thus, causes data duplication.
+```bash
+python main.py
+```
 
-? old chunks to be discarded and new modified chunks to be kept, to keep RAG updated.
+Follow the on-screen instructions to interact with the document Q&A system.
 
-#in meta_data = {pdf_has:<hash_of_file>, chunk_hash: <hash_of_each_chunk>}
+## Contributing
+We welcome contributions from the community! Please follow these steps to contribute:
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-branch`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some feature'`)
+5. Push to the branch (`git push origin feature-branch`)
+6. Open a Pull Request
 
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Approach:
-1. keep pdf_hash  for file information useful for traceability and deletion.
-2. Do paragraph/section based hashing instead of chunk hasing to avoid boundary shifts.
-3. If paragraph/section hash is present in existing_hash: skip it, else add it.
-4. For deletion of older chunk which is modified now:
-hash from old chunk, which is not present in new chunk hash, delete that chunk  (avoids re-indexing of the same data, as well data duplication)
-5. ? If i am using paragraph/section based hashing, and not using recursivecharactertextsplitter, do i not loose the importance of this recurisve splitter ?
-
-
--> New Approach: semantic approach (where each section like introduction, abstract, header1.... is split )
-there should be a sized based fallback as well, when size of a section is too much, then it is further split.
-
-
-#Re-ranking approach
--> After semantic retrieval of top 10 chunks
--> Keywords are extracted from user's query such as (text with underscore, numbers, os any completely upper case words, using regular expression)
--> Then top 10 chunk is split into 2 halves of 3 and 7.(to make sure semantic result is not overridden by keyword coincidence)
--> Top 3 group is re-rank using keywords extracted.
-where for each chunk, scoring is done based on presence of keyword in chunk i.e if keyword is present in chunk then plus 1
--> Same scoring is done for Rest 7 group
-If score > 0, keep the chunk else discard it.
--> Top 3 group is sorted in descending order based on score and same is done with rest 7 group.
--> Top 3 group is appended with Rest 7 group.
--> Then they are merged with double new line to return it as a context.
-
-
-
-
-
-pending:
----------
-1. when no document is processed, and question is provided and answer button is clicked, then it gives random error- needs to be fixed.
-2. deployment works fine: https://adv-rag-pdf.streamlit.app/
--> currently if a document is processed, faiss_index file is created, and it is common to any user.
--> need to add register/signin feature to make it user specific.
-3. why would anyone use my application, if they can use chatgpt and gemini to process their file, and perform RAG over there.
-4. Limit users usage.
-
+## Contact Information
+For any inquiries, please contact:
+- **Name**: Keshabh
+- **Email**: [your-email@example.com]
