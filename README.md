@@ -23,7 +23,7 @@ pip install -r requirements.txt
 To run the project, execute the following command:
 
 ```bash
-python main.py
+python app/app.py
 ```
 
 Follow the on-screen instructions to interact with the document Q&A system.
