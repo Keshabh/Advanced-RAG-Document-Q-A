@@ -3,6 +3,15 @@
 ## Description
 The Advanced RAG Document Q&A project aims to provide an efficient solution for question answering using Retrieval-Augmented Generation (RAG) principles. This repository showcases a tailored approach to document retrieval and answer generation utilizing state-of-the-art AI techniques.
 
+## Usage
+To run the project, execute the following command:
+
+```bash
+streamlit run app/app.py
+```
+
+Follow the on-screen instructions to interact with the document Q&A system.
+
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
@@ -18,15 +27,6 @@ git clone https://github.com/Keshabh/Advanced-RAG-Document-Q-A.git
 cd Advanced-RAG-Document-Q-A
 pip install -r requirements.txt
 ```
-
-## Usage
-To run the project, execute the following command:
-
-```bash
-streamlit run app/app.py
-```
-
-Follow the on-screen instructions to interact with the document Q&A system.
 
 ## Contributing
 We welcome contributions from the community! Please follow these steps to contribute:
