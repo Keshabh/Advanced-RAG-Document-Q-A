@@ -36,17 +36,6 @@ Supports simultaneous upload and processing of:
 - ✅ PPTX (`python-pptx`)
 - ✅ TXT
 - ✅ CSV (`pandas`)
-
-### Architecture
-- Automatic extension-based routing
-- Dedicated extractor per format:
-  - `extract_pdf`
-  - `extract_docx`
-  - `extract_txt`
-  - `extract_csv`
-  - `extract_pptx`
-- Unified ingestion pipeline via `processFiles()`
-
 ---
 
 ## 2️⃣ Intelligent Text Processing
@@ -157,8 +146,6 @@ Used for:
 
 ---
 
----
-
 # 🏗 Architecture Overview
 
 ```
@@ -218,27 +205,6 @@ Used for:
    - Top 3 chunks selected
 8. Strict prompt grounding
 9. Gemini LLM generates deterministic answer
-
----
-
-# 🏗 Project Structure
-app/
-└── app.py
-
-core/
-├── embeddings.py
-├── llm.py
-├── prompt.py
-├── retriever.py
-└── vector_store.py
-
-services/
-├── pdf_processor.py
-├── chunking.py
-└── hashing.py
-
-config.py
-
 
 ---
 
