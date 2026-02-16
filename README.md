@@ -2,7 +2,7 @@
 
 # 🏷 Badges
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
 ![FAISS](https://img.shields.io/badge/FAISS-Vector%20Store-green)
 ![LangChain](https://img.shields.io/badge/LangChain-Framework-yellow)
