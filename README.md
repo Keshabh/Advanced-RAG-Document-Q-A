@@ -1,39 +1,142 @@
-## Features
+# 📄 Advanced RAG – Multi-Format Document Q&A System
 
-### 1. **Multi-Document PDF Processing**
-   - Upload multiple PDF files simultaneously
-   - Extract text from PDFs with PyPDF2
-   - Semantic section detection (Abstract, numbered sections, etc.)
+An AI-powered Retrieval-Augmented Generation (RAG) system that supports **multi-format document ingestion**, **incremental vector indexing**, and a **hybrid retrieval pipeline** combining semantic search with keyword re-ranking.
 
-### 2. **Intelligent Text Chunking**
-   - RecursiveCharacterTextSplitter with 1000-char chunks and 200-char overlap
-   - Semantic section-based splitting (preserves document structure)
-   - Duplicate detection using SHA-256 hashing (prevents re-processing)
+Built with **Streamlit, FAISS, LangChain, and Google Gemini**.
 
-### 3. **Hybrid Retrieval System**
-   - **Semantic Search**: FAISS vector store similarity search (k=10)
-   - **Keyword Extraction**: Extracts error codes, numbers, uppercase tokens (ORA, HTTP, etc.)
-   - **Keyword Re-ranking**: Filters and ranks results by keyword score
-   - Fallback mechanism for missing keyword hits
+---
 
-### 4. **Vector Store Management**
-   - Persistent FAISS vector store with incremental updates
-   - Chunk hashing to avoid duplication
-   - Automatic deletion of stale chunks when documents change
-   - Support for metadata tracking (PDF hash, chunk hash, source file)
+# 🚀 Features
 
-### 5. **Prompt Engineering**
-   - Strict document-grounded prompts (no external knowledge allowed)
-   - Context-based Q&A with exact value reproduction
-   - Guard rails: Returns "The document does not contain this information" when needed
+## 1️⃣ Multi-Format Document Processing
 
-### 6. **LLM Integration**
-   - Google Gemini 2.5 Flash Lite model
-   - Zero temperature (deterministic responses)
-   - Google Generative AI embeddings
+Supports simultaneous upload and processing of:
 
-### 7. **Streamlit UI**
-   - Sidebar for PDF uploads with multi-file support
-   - Text input for user queries
-   - Real-time processing feedback (success/info messages)
-   - Response display with BlobSha 80ce885edb71141dde3bff32b2dbe97c2e5c4481
+- ✅ PDF (`PyPDF2`)
+- ✅ DOCX (`python-docx`)
+- ✅ PPTX (`python-pptx`)
+- ✅ TXT
+- ✅ CSV (`pandas`)
+
+### Architecture
+- Automatic extension-based routing
+- Dedicated extractor per format:
+  - `extract_pdf`
+  - `extract_docx`
+  - `extract_txt`
+  - `extract_csv`
+  - `extract_pptx`
+- Unified ingestion pipeline via `processFiles()`
+
+---
+
+## 2️⃣ Intelligent Text Processing
+
+### 🔹 Semantic Section Detection
+Custom regex-based section splitter:
+- Detects `Abstract`
+- Detects numbered sections like `1 Introduction`
+- Preserves structural context before chunking
+
+### 🔹 Recursive Chunking
+- `RecursiveCharacterTextSplitter`
+- Chunk size: **1000**
+- Overlap: **200**
+- Avoids over-splitting short semantic sections
+
+---
+
+## 3️⃣ Incremental Vector Indexing (No Duplication)
+
+### 🔹 SHA-256 Hashing
+- File-level hashing
+- Chunk-level hashing
+- Prevents duplicate re-processing
+
+### 🔹 Smart Update Logic
+- Adds only new chunks
+- Automatically deletes stale chunks
+- Preserves unchanged vectors
+
+No full re-indexing required.
+
+---
+
+## 4️⃣ Hybrid Retrieval System
+
+### Step 1 – Semantic Search
+- FAISS similarity search (`k=10`)
+
+### Step 2 – Keyword Extraction
+Extracts:
+- Numbers
+- Error codes
+- Uppercase tokens (e.g., HTTP, ORA)
+- snake_case tokens
+
+### Step 3 – Keyword Re-ranking
+- Scores documents by keyword match count
+- Falls back to semantic top-3 if no keyword matches
+
+Balances **precision + recall** effectively.
+
+---
+
+## 5️⃣ Strict Prompt Guardrails
+
+Custom prompt template enforcing:
+
+- Answers only from retrieved context
+- No external knowledge usage
+- Exact value reproduction when required
+- Safe fallback:
+  
+  > "The document does not contain this information."
+
+Deterministic responses (temperature = 0).
+
+---
+
+## 6️⃣ LLM & Embeddings
+
+- **LLM:** `gemini-2.5-flash-lite`
+- **Embeddings:** `models/gemini-embedding-001`
+- Google Generative AI via `langchain_google_genai`
+
+---
+
+## 7️⃣ Persistent FAISS Vector Store
+
+- Stored locally at `faiss_index/`
+- Loaded automatically on app startup
+- Safe deserialization enabled
+- Incrementally updated
+
+---
+
+## 8️⃣ Metadata Tracking
+
+Each chunk stores:
+
+- `file_hash`
+- `chunk_hash`
+- `source` (original filename)
+
+Used for:
+- Duplicate detection
+- Stale chunk cleanup
+- Source tracking
+
+---
+
+## 9️⃣ Streamlit Interface
+
+- Multi-file upload
+- Real-time processing feedback
+- Context-grounded Q&A
+- Session-based vector store management
+
+---
+
+# 🏗 Project Structure
+
