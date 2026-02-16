@@ -139,4 +139,32 @@ Used for:
 ---
 
 # 🏗 Project Structure
+app/
+└── app.py
 
+core/
+├── embeddings.py
+├── llm.py
+├── prompt.py
+├── retriever.py
+└── vector_store.py
+
+services/
+├── pdf_processor.py
+├── chunking.py
+└── hashing.py
+
+config.py
+
+
+---
+
+# ⚙️ Setup
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone <repo-url>
+cd Advanced-RAG-Document-Q-A
+
+## 1️⃣ Clone Repository
