@@ -12,7 +12,7 @@
 ---
 
 # 🖼 Demo
-![Demo](applicationDemo.gif)
+![Demo](appDemo.gif)
 
 ---
 
