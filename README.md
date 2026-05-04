@@ -259,14 +259,28 @@ streamlit run app/app.py
 
 # 🔮 Future Enhancements
 
-- Centralized configuration for `chunk_size`, `chunk_overlap`, and `top_k`  
-- Structured logging using Python `logging` module for better observability  
-- Robust exception handling to prevent runtime crashes (e.g., no FAISS index, empty query)  
-- Evaluation mode to display retrieved chunks before LLM generation  
-- FastAPI backend separation (client–server architecture)  
-- User authentication with user-specific vector stores  
-- Rate limiting and usage controls for public deployment  
-- Conversational memory with multi-turn chat interface  
-- Metadata-based filtering during retrieval  
-- Streaming LLM responses for improved UX  
-- Enhanced UI with GPT-style chat experience  
+## Area of Business Improvements:
+1. Handling of processing of corrupted files, password-protected files.
+2. User specfic system with Register/Login.
+3. Scaling- 
+3.1 File ingestion can be made parallel instead of sequential processing queue.
+3.2 Storage of vector indexes is currently done in RAM, with increase in thousands of files, we may need to shift to cloud based vector database such as pinecone..
+3.3 Sending so many chunks to embedding models can cause API rate limit to be hit, to avoid it, we can perform embedding in batches.
+3.4 For all users index can be placed at one place with user metadat, but during retrieval, meta-data filtering based on user can be done.
+4. Check file hash if present in vector db, if present, then it avoids checking hash for each chunk.
+5. Using a regex based for understanding content layout of file is a fragile process, cause a file can have content in any layout.
+6. Currently, stale chunks being removed can also remove other files chunks as well, which needs to be changed to make sure only for the file whose chunks has been updated, only for that file, stale chunks should be deleted.
+7. Most vector DBs (or frameworks like LangChain) have built-in Hybrid Search or Rerankers (like BGE-Reranker) that are much more accurate than manual keyword counting.
+8. User follow up question is not supported yet, cause it requires conversation history to be restored as well either in current session or the session to be restored across all the sessions.
+9. Retreival logic does not support fileName, page no specific retrieval currently.
+10. Answer critique can be added to make sure it checks the answer given is right.
+11. To show response to user, streaming can be used.
+12. If document contains images, then use OCR step (like PyTesseract or Gemini's vision capabilities) to extract that data.
+13. Standard RecursiveCharacterTextSplitter often breaks tables into meaningless rows. We need a Layout-Aware Parser (like Unstructured.io) to preserve table structures.
+14. If faiss index size is huge, then with app start, index load time can cause system delay. This can be handled  with ??????
+15. Caching can be used, where if 2 users ask same question, then answer can be given without making any LLM call.
+
+
+## Area of Coding Improvements:
+1. Centralized configuration for chunk_size, chunk_overlap, and top_k
+2. Structured logging using Python logging module for better observability
